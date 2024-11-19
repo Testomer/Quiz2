@@ -41,11 +41,13 @@
         button:hover {
             background-color: #218838;
         }
+        .result-container {
+            display: none;
+        }
         .result {
             margin-top: 20px;
             font-size: 20px;
             font-weight: bold;
-            display: none;
         }
     </style>
 </head>
@@ -84,13 +86,22 @@
                 <label><input type="radio" name="q5" value="1"> الكوفية</label><br>
                 <label><input type="radio" name="q5" value="0"> العلم</label>
             </div>
-            <button type="button" onclick="calculateResult()">اضغط هنا لرؤية نتيجتك</button>
+            <button type="button" onclick="showResult()">اعرف نتيجتك</button>
         </form>
-        <div id="result" class="result"></div>
+    </div>
+
+    <div class="result-container" id="resultContainer">
+        <h2>نتيجتك</h2>
+        <div class="result" id="resultDisplay"></div>
+        <button onclick="reloadPage()">إعادة الاختبار</button>
     </div>
 
     <script>
-        function calculateResult() {
+        let formLocked = false;
+
+        function showResult() {
+            if (formLocked) return;
+
             const name = document.getElementById("studentName").value;
             const questions = document.querySelectorAll('input[type="radio"]:checked');
             let score = 0;
@@ -99,13 +110,27 @@
                 score += parseInt(q.value);
             });
 
-            const resultDiv = document.getElementById("result");
-            resultDiv.style.display = "block";
-            resultDiv.innerHTML = `
-                <h2>هذه نتيجتك نتمنى لك النجاح والتوفيق.</h2>
-                <p>${name ? "الطالب: " + name : ""}</p>
+            if (questions.length < 5 || !name.trim()) {
+                alert("يرجى الإجابة عن جميع الأسئلة وإدخال اسمك.");
+                return;
+            }
+
+            formLocked = true;
+
+            // إخفاء الاختبار وعرض النتيجة
+            document.querySelector(".container").style.display = "none";
+            const resultContainer = document.getElementById("resultContainer");
+            const resultDisplay = document.getElementById("resultDisplay");
+
+            resultContainer.style.display = "block";
+            resultDisplay.innerHTML = `
+                <p>${name ? "الاسم: " + name : ""}</p>
                 <p>عدد الإجابات الصحيحة: ${score} من 5</p>
             `;
+        }
+
+        function reloadPage() {
+            location.reload();
         }
     </script>
 </body>
